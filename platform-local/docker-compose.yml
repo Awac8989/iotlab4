@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  emqx:
+    image: emqx:5.8
+    container_name: emqx-local
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "8083:8083"
+      - "18083:18083"
+    volumes:
+      - ./emqx/etc/emqx.conf:/opt/emqx/etc/emqx.conf
+
+  mongo:
+    image: mongo:7
+    container_name: smartdash-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:

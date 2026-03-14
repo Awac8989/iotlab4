@@ -1,7 +1,8 @@
-const whitelist = ["http://localhost:3000", "https://smarti-board.netlify.app"];
+const whitelist = ["http://localhost:3000", "http://localhost:3001", "https://smarti-board.netlify.app"];
 const cors_options = {
   origin: function (origin, callback) {
-    if (!origin || whitelist.indexOf(origin) !== -1) {
+    const isLocalhost = /^http:\/\/localhost:\d+$/.test(origin || "");
+    if (!origin || whitelist.indexOf(origin) !== -1 || isLocalhost) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));

@@ -10,7 +10,18 @@ const request = ({
   withNotification = false,
   data,
 }) => {
-  axios({ url, data, method })
+  const token = localStorage.getItem("iot_token");
+
+  axios({
+    url,
+    data,
+    method,
+    headers: token
+      ? {
+          Authorization: `Bearer ${token}`,
+        }
+      : {},
+  })
     .then((response) => {
       callback(response);
       withNotification === true &&

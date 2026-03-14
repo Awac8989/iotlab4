@@ -1,74 +1,117 @@
-# MERN + ESP32 Smart Home Dashboard
+# Smart Dashboard - IoT Lab 4
 
-Welcome to the MERN + ESP32 Smart Home Dashboard project! This project combines the power of the MERN stack (MongoDB, Express.js, React, Node.js) with ESP32 micro-controllers to create a comprehensive smart home dashboard.
+This repository is updated to satisfy Lab 4 requirements with full components:
+- Device: ESP32/ESP8266 (BH1750 + DHT11/DHT22)
+- API: Node.js/Express REST APIs
+- Database: MongoDB
+- Web UI: Login, Dashboard, Main, Charts, Logs
+- IoT Platform local: EMQX + MongoDB using Docker Compose
 
-## Screenshots
+## 1. Run local IoT platform
 
-![Dashboard](Screenshots/dashboard-1.png)
-![Dashboard](Screenshots/dashboard-2.png)
-![Dashboard](Screenshots/dashboard-3.png)
-![Offline](Screenshots/offline.png "Offline")
-## Features
+```bash
+cd platform-local
+docker compose up -d
+```
 
-- Monitor and control various devices within your smart home remotely.
-- Real-time updates on temperature, humidity, and device statuses.
-- Interactive dashboard for managing room details and device statuses.
-- MQTT integration for efficient communication between devices and the server.
-- Database storage for historical data and analytics.
+Services:
+- EMQX MQTT broker: `mqtt://localhost:1883`
+- EMQX websocket: `ws://localhost:8083`
+- EMQX dashboard: `http://localhost:18083`
+- MongoDB: `mongodb://localhost:27017`
 
-## Getting Started
+## 2. Run backend API
 
-### Prerequisites
+```bash
+cd server
+npm install
+npm start
+```
 
-- Node.js and npm (Node Package Manager)
-- MongoDB (for server database)
-- ESP32 micro-controllers (for IoT devices)
+Default config:
+- Port: `5000`
+- MongoDB URI: `mongodb://127.0.0.1:27017/smart_dashboard`
 
-### Installation
+Default account created automatically:
+- Username: `admin`
+- Password: `123456`
 
-1. Clone the repository:
+## 3. Run frontend
 
-   ```bash
-   git clone https://github.com/NassimBenNsib/SmartHomeDashboard-MERN-ESP32.git
-   cd SmartHomeDashboard-MERN-ESP32
-    ```
+```bash
+cd client
+npm install
+npm start
+```
 
-2.  Install server dependencies: `cd server` && `npm install`
-3.  Server Configuration 
-    -   Update mqtt_broker_config.js with your MQTT broker details.
-    -   Configure database_setup.js with your MongoDB URI.
-    -   Customize structure.js for your house details.
-4.  Start the server: `npm start`
-5.  Install client dependencies: `cd ../client` && `npm install`
-6.  Client Configuration 
-    -   Update apis.config.js with your apis details.
-    -   Update weather.config.js with your OpenWeather details.
-7.  Start the client: `npm start`
+Open:
+- `http://localhost:3000` (or `http://localhost:3001` if 3000 is busy)
 
-## Usage
-1.  Access the dashboard by navigating to http://localhost:3000 in your browser.
-2.  View real-time updates, control devices, and manage room details.
-3.  ESP32 devices can communicate with the server using MQTT.
+## 4. Implemented pages
 
-## Contributing
+- `Login`: username/password + JWT authentication
+- `Dashboard`: welcome, group info, device status, last seen (>=2 devices)
+- `Main`: current sensor values and control LED N1/N2 via MQTT (`led/n1`, `led/n2`)
+- `Charts`: real-time 3 chart types
+  - Temperature: Line
+  - Humidity: Bar
+  - Light: Radar
+- `Logs`: table with pagination + auto refresh + search/filter + CSV/XLSX export
 
-Contributions are welcome! If you find bugs or want to add new features, please follow these steps:
+Required log fields:
+- ID
+- IP
+- Device Name
+- Device ID
+- Sensor Type
+- Value
+- Time
 
-1.  Fork the repository.
-2.  Create a new branch: git checkout -b feature-name
-3.  Commit your changes: git commit -m 'Add some feature'
-4.  Push to the branch: git push origin feature-name
-5.  Submit a pull request.
+## 5. API summary
 
-## License
+All APIs return JSON in this format:
 
-This project is licensed under the [MIT License](LICENSE).
+```json
+{
+  "error": false,
+  "message": "this is a message of API",
+  "data": {}
+}
+```
 
-## Acknowledgments
+Main endpoints:
+- `POST /auth/register`
+- `POST /auth/login`
+- `GET /auth/me`
+- `GET /dashboard`
+- `GET /house-details`
+- `PATCH /devices-details`
+- `PATCH /rooms-details`
+- `PATCH /rooms-details/temperature`
+- `PUT /led-control`
+- `GET /sensors/current`
+- `GET /charts`
+- `GET /logs`
+- `POST /logs`
+- `PUT /logs/:id`
+- `DELETE /logs/:id`
+- `GET /logs/export?format=csv|xlsx`
 
-This project was inspired by the need for a comprehensive smart home solution.
-Thanks to the open-source community for their invaluable contributions.
+## 6. MQTT Client requirements for ESP32
 
-## Contact
+See detailed guides:
+- `docs/esp32/scenario_1_menuconfig.md`
+- `docs/esp32/scenario_2_hardcoded_wifi.md`
+- `docs/esp32/scenario_3_ble_provisioning.md`
 
-For questions or inquiries, contact [nassim.bennsib@gmail.com](mailto:nassim.bennsib@gmail.com).
+These cover:
+- Menuconfig WiFi + `/topic/qos0` subscribe and `/topic/qos1` publish
+- Hardcoded WiFi + `/test/topic` and `/test/topic1`
+- BLE provisioning via `ESP BLE Provisioning` app
+
+## 7. Database design notes for report
+
+Collections:
+- `room_details`: room sensor snapshots (temperature, humidity, light, room, device, ip)
+- `device_logs`: detailed logs (id, ip, deviceName, sensorType, value, timestamp)
+- `users`: authentication users (username, passwordHash, role)
