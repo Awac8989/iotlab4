@@ -1,0 +1,107 @@
+menu "IoT Lab4 Firmware Settings"
+
+    config LAB4_BROKER_URL
+        string "MQTT broker URL"
+        default "mqtt://broker.emqx.io:1883"
+
+    config LAB4_MQTT_TOPIC_ROOMS
+        string "MQTT topic to publish room sensor JSON"
+        default "b556606d67dd8c7cecfab843fecbe28c/projet-IoT-2022-2023/hardware/Rooms Details"
+
+    config LAB4_MQTT_TOPIC_QOS0_SUB
+        string "Scenario 1 subscribe topic"
+        default "/topic/qos0"
+
+    config LAB4_MQTT_TOPIC_QOS1_PUB
+        string "Scenario 1 publish topic"
+        default "/topic/qos1"
+
+    config LAB4_MQTT_TOPIC_TEST_PUB
+        string "Scenario 2 publish topic"
+        default "/test/topic"
+
+    config LAB4_MQTT_TOPIC_TEST_SUB
+        string "Scenario 2 subscribe topic"
+        default "/test/topic1"
+
+    config LAB4_MQTT_TOPIC_LED_N1
+        string "LED N1 control topic"
+        default "led/n1"
+
+    config LAB4_MQTT_TOPIC_LED_N2
+        string "LED N2 control topic"
+        default "led/n2"
+
+    config LAB4_ROOM_NAME
+        string "Room label sent to backend"
+        default "Living Room"
+
+    config LAB4_DEVICE_ID
+        string "Device ID"
+        default "esp32-001"
+
+    config LAB4_DEVICE_NAME
+        string "Device Name"
+        default "ESP32-BH1750-DHT"
+
+    config LAB4_PUBLISH_INTERVAL_MS
+        int "Publish interval (ms)"
+        default 5000
+        range 1000 60000
+
+    choice LAB4_WIFI_MODE
+        prompt "WiFi mode"
+        default LAB4_WIFI_MODE_MENUCONFIG
+
+        config LAB4_WIFI_MODE_MENUCONFIG
+            bool "Scenario 1 - menuconfig (example_connect)"
+
+        config LAB4_WIFI_MODE_HARDCODED
+            bool "Scenario 2 - hardcoded in source"
+
+        config LAB4_WIFI_MODE_BLE_PROVISIONING
+            bool "Scenario 3 - BLE provisioning (example_connect)"
+
+    endchoice
+
+    config LAB4_WIFI_HARDCODED_SSID
+        string "Hardcoded WiFi SSID"
+        default "YOUR_WIFI_SSID"
+
+    config LAB4_WIFI_HARDCODED_PASSWORD
+        string "Hardcoded WiFi password"
+        default "YOUR_WIFI_PASSWORD"
+
+    config LAB4_I2C_SDA_GPIO
+        int "BH1750 SDA GPIO"
+        default 21
+
+    config LAB4_I2C_SCL_GPIO
+        int "BH1750 SCL GPIO"
+        default 22
+
+    config LAB4_DHT_GPIO
+        int "DHT11/DHT22 DATA GPIO"
+        default 4
+
+    choice LAB4_DHT_SENSOR_TYPE
+        prompt "DHT sensor type"
+        default LAB4_DHT_IS_DHT22
+
+        config LAB4_DHT_IS_DHT22
+            bool "DHT22"
+
+        config LAB4_DHT_IS_DHT11
+            bool "DHT11"
+
+    endchoice
+
+    config LAB4_LED_N1_GPIO
+        int "LED N1 GPIO"
+        default 2
+
+    config LAB4_LED_N2_GPIO
+        int "LED N2 GPIO"
+        default 15
+
+endmenu
